@@ -58,10 +58,14 @@ namespace ApiWithoutSecrets {
   bool VulkanCommon::OnWindowSizeChanged() {
     ChildClear();
 
-    if( !CreateSwapChain() ) {
-      return false;
+    if( CreateSwapChain() ) {
+      if( CanRender ) {
+        return ChildOnWindowSizeChanged();
+      }
+      return true;
     }
-    return ChildOnWindowSizeChanged();
+
+    return false;
   }
 
   VkPhysicalDevice VulkanCommon::GetPhysicalDevice() const {
@@ -88,7 +92,7 @@ namespace ApiWithoutSecrets {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
     VulkanLibrary = LoadLibrary( "vulkan-1.dll" );
 #elif defined(VK_USE_PLATFORM_XCB_KHR) || defined(VK_USE_PLATFORM_XLIB_KHR)
-    VulkanLibrary = dlopen( "libvulkan.so", RTLD_NOW );
+    VulkanLibrary = dlopen( "libvulkan.so.1", RTLD_NOW );
 #endif
 
     if( VulkanLibrary == nullptr ) {
@@ -167,7 +171,7 @@ namespace ApiWithoutSecrets {
       VK_MAKE_VERSION( 1, 0, 0 ),                     // uint32_t                   applicationVersion
       "Vulkan Tutorial by Intel",                     // const char                *pEngineName
       VK_MAKE_VERSION( 1, 0, 0 ),                     // uint32_t                   engineVersion
-      VK_API_VERSION                                  // uint32_t                   apiVersion
+      VK_MAKE_VERSION( 1, 0, 0 )                      // uint32_t                   apiVersion
     };
 
     VkInstanceCreateInfo instance_create_info = {
@@ -219,7 +223,7 @@ namespace ApiWithoutSecrets {
       VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR,    // VkStructureType                  sType
       nullptr,                                          // const void                      *pNext
       0,                                                // VkXcbSurfaceCreateFlagsKHR       flags
-      Window.Connection,                                // xcb_connection_t*                connection
+      Window.Connection,                                // xcb_connection_t                *connection
       Window.Handle                                     // xcb_window_t                     window
     };
 
@@ -355,7 +359,7 @@ namespace ApiWithoutSecrets {
 
     uint32_t major_version = VK_VERSION_MAJOR( device_properties.apiVersion );
 
-    if( (major_version < 1) &&
+    if( (major_version < 1) ||
         (device_properties.limits.maxImageDimension2D < 4096) ) {
       std::cout << "Physical device " << physical_device << " doesn't support required parameters!" << std::endl;
       return false;
@@ -434,14 +438,16 @@ namespace ApiWithoutSecrets {
   }
 
   bool VulkanCommon::CreateSwapChain() {
+    CanRender = false;
+
     if( Vulkan.Device != VK_NULL_HANDLE ) {
       vkDeviceWaitIdle( Vulkan.Device );
     }
 
     for( size_t i = 0; i < Vulkan.SwapChain.Images.size(); ++i ) {
-      if( Vulkan.SwapChain.Images[i].ImageView != VK_NULL_HANDLE ) {
-        vkDestroyImageView( GetDevice(), Vulkan.SwapChain.Images[i].ImageView, nullptr );
-        Vulkan.SwapChain.Images[i].ImageView = VK_NULL_HANDLE;
+      if( Vulkan.SwapChain.Images[i].View != VK_NULL_HANDLE ) {
+        vkDestroyImageView( GetDevice(), Vulkan.SwapChain.Images[i].View, nullptr );
+        Vulkan.SwapChain.Images[i].View = VK_NULL_HANDLE;
       }
     }
     Vulkan.SwapChain.Images.clear();
@@ -491,6 +497,11 @@ namespace ApiWithoutSecrets {
     }
     if( static_cast<int>(desired_present_mode) == -1 ) {
       return false;
+    }
+    if( (desired_extent.width == 0) || (desired_extent.height == 0) ) {
+      // Current surface size is (0, 0) so we can't create a swap chain and render anything (CanRender == false)
+      // But we don't wont to kill the application as this situation may occur i.e. when window gets minimized
+      return true;
     }
 
     VkSwapchainCreateInfoKHR swap_chain_create_info = {
@@ -570,11 +581,13 @@ namespace ApiWithoutSecrets {
         }
       };
 
-      if( vkCreateImageView( GetDevice(), &image_view_create_info, nullptr, &Vulkan.SwapChain.Images[i].ImageView ) != VK_SUCCESS ) {
+      if( vkCreateImageView( GetDevice(), &image_view_create_info, nullptr, &Vulkan.SwapChain.Images[i].View ) != VK_SUCCESS ) {
         std::cout << "Could not create image view for framebuffer!" << std::endl;
         return false;
       }
     }
+
+    CanRender = true;
 
     return true;
   }
@@ -700,8 +713,8 @@ namespace ApiWithoutSecrets {
       vkDeviceWaitIdle( Vulkan.Device );
 
       for( size_t i = 0; i < Vulkan.SwapChain.Images.size(); ++i ) {
-        if( Vulkan.SwapChain.Images[i].ImageView != VK_NULL_HANDLE ) {
-          vkDestroyImageView( GetDevice(), Vulkan.SwapChain.Images[i].ImageView, nullptr );
+        if( Vulkan.SwapChain.Images[i].View != VK_NULL_HANDLE ) {
+          vkDestroyImageView( GetDevice(), Vulkan.SwapChain.Images[i].View, nullptr );
         }
       }
 

@@ -27,7 +27,7 @@ namespace ApiWithoutSecrets {
         VK_ATTACHMENT_STORE_OP_STORE,               // VkAttachmentStoreOp            storeOp
         VK_ATTACHMENT_LOAD_OP_DONT_CARE,            // VkAttachmentLoadOp             stencilLoadOp
         VK_ATTACHMENT_STORE_OP_DONT_CARE,           // VkAttachmentStoreOp            stencilStoreOp
-        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,            // VkImageLayout                  initialLayout;
+        VK_IMAGE_LAYOUT_UNDEFINED,                  // VkImageLayout                  initialLayout;
         VK_IMAGE_LAYOUT_PRESENT_SRC_KHR             // VkImageLayout                  finalLayout
       }
     };
@@ -85,7 +85,7 @@ namespace ApiWithoutSecrets {
         0,                                          // VkFramebufferCreateFlags       flags
         Vulkan.RenderPass,                          // VkRenderPass                   renderPass
         1,                                          // uint32_t                       attachmentCount
-        &swap_chain_images[i].ImageView,            // const VkImageView             *pAttachments
+        &swap_chain_images[i].View,                 // const VkImageView             *pAttachments
         300,                                        // uint32_t                       width
         300,                                        // uint32_t                       height
         1                                           // uint32_t                       layers
@@ -398,7 +398,7 @@ namespace ApiWithoutSecrets {
           nullptr,                                    // const void                    *pNext
           VK_ACCESS_MEMORY_READ_BIT,                  // VkAccessFlags                  srcAccessMask
           VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,       // VkAccessFlags                  dstAccessMask
-          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,            // VkImageLayout                  oldLayout
+          VK_IMAGE_LAYOUT_UNDEFINED,                  // VkImageLayout                  oldLayout
           VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,            // VkImageLayout                  newLayout
           GetPresentQueue().FamilyIndex,              // uint32_t                       srcQueueFamilyIndex
           GetGraphicsQueue().FamilyIndex,             // uint32_t                       dstQueueFamilyIndex
@@ -494,7 +494,7 @@ namespace ApiWithoutSecrets {
         return false;
     }
 
-    VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     VkSubmitInfo submit_info = {
       VK_STRUCTURE_TYPE_SUBMIT_INFO,                // VkStructureType              sType
       nullptr,                                      // const void                  *pNext

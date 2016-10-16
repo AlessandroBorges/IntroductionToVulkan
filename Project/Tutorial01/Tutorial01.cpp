@@ -59,7 +59,7 @@ namespace ApiWithoutSecrets {
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
     VulkanLibrary = LoadLibrary( "vulkan-1.dll" );
 #elif defined(VK_USE_PLATFORM_XCB_KHR) || defined(VK_USE_PLATFORM_XLIB_KHR)
-    VulkanLibrary = dlopen( "libvulkan.so", RTLD_NOW );
+    VulkanLibrary = dlopen( "libvulkan.so.1", RTLD_NOW );
 #endif
 
     if( VulkanLibrary == nullptr ) {
@@ -107,7 +107,7 @@ namespace ApiWithoutSecrets {
       VK_MAKE_VERSION( 1, 0, 0 ),                     // uint32_t                   applicationVersion
       "Vulkan Tutorial by Intel",                     // const char                *pEngineName
       VK_MAKE_VERSION( 1, 0, 0 ),                     // uint32_t                   engineVersion
-      VK_API_VERSION                                  // uint32_t                   apiVersion
+      VK_MAKE_VERSION( 1, 0, 0 )                      // uint32_t                   apiVersion
     };
 
     VkInstanceCreateInfo instance_create_info = {
@@ -210,7 +210,7 @@ namespace ApiWithoutSecrets {
     uint32_t minor_version = VK_VERSION_MINOR( device_properties.apiVersion );
     uint32_t patch_version = VK_VERSION_PATCH( device_properties.apiVersion );
 
-    if( (major_version < 1) &&
+    if( (major_version < 1) ||
         (device_properties.limits.maxImageDimension2D < 4096) ) {
       std::cout << "Physical device " << physical_device << " doesn't support required parameters!" << std::endl;
       return false;
@@ -273,4 +273,4 @@ namespace ApiWithoutSecrets {
     }
   }
 
-} // namespace Tutorial
+} // namespace ApiWithoutSecrets

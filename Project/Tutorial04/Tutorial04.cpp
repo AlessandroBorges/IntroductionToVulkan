@@ -8,6 +8,7 @@
 // Intel does not assume any responsibility for any errors which may appear in this software
 // nor any responsibility to update it.
 
+#include <cstddef>
 #include "Tutorial04.h"
 #include "VulkanFunctions.h"
 
@@ -20,50 +21,71 @@ namespace ApiWithoutSecrets {
   bool Tutorial04::CreateRenderPass() {
     VkAttachmentDescription attachment_descriptions[] = {
       {
-        0,                                          // VkAttachmentDescriptionFlags   flags
-        GetSwapChain().Format,                      // VkFormat                       format
-        VK_SAMPLE_COUNT_1_BIT,                      // VkSampleCountFlagBits          samples
-        VK_ATTACHMENT_LOAD_OP_CLEAR,                // VkAttachmentLoadOp             loadOp
-        VK_ATTACHMENT_STORE_OP_STORE,               // VkAttachmentStoreOp            storeOp
-        VK_ATTACHMENT_LOAD_OP_DONT_CARE,            // VkAttachmentLoadOp             stencilLoadOp
-        VK_ATTACHMENT_STORE_OP_DONT_CARE,           // VkAttachmentStoreOp            stencilStoreOp
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,   // VkImageLayout                  initialLayout;
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL    // VkImageLayout                  finalLayout
+        0,                                              // VkAttachmentDescriptionFlags   flags
+        GetSwapChain().Format,                          // VkFormat                       format
+        VK_SAMPLE_COUNT_1_BIT,                          // VkSampleCountFlagBits          samples
+        VK_ATTACHMENT_LOAD_OP_CLEAR,                    // VkAttachmentLoadOp             loadOp
+        VK_ATTACHMENT_STORE_OP_STORE,                   // VkAttachmentStoreOp            storeOp
+        VK_ATTACHMENT_LOAD_OP_DONT_CARE,                // VkAttachmentLoadOp             stencilLoadOp
+        VK_ATTACHMENT_STORE_OP_DONT_CARE,               // VkAttachmentStoreOp            stencilStoreOp
+        VK_IMAGE_LAYOUT_UNDEFINED,                      // VkImageLayout                  initialLayout;
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR                 // VkImageLayout                  finalLayout
       }
     };
 
     VkAttachmentReference color_attachment_references[] = {
       {
-        0,                                          // uint32_t                       attachment
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL    // VkImageLayout                  layout
+        0,                                              // uint32_t                       attachment
+        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL        // VkImageLayout                  layout
       }
     };
 
     VkSubpassDescription subpass_descriptions[] = {
       {
-        0,                                          // VkSubpassDescriptionFlags      flags
-        VK_PIPELINE_BIND_POINT_GRAPHICS,            // VkPipelineBindPoint            pipelineBindPoint
-        0,                                          // uint32_t                       inputAttachmentCount
-        nullptr,                                    // const VkAttachmentReference   *pInputAttachments
-        1,                                          // uint32_t                       colorAttachmentCount
-        color_attachment_references,                // const VkAttachmentReference   *pColorAttachments
-        nullptr,                                    // const VkAttachmentReference   *pResolveAttachments
-        nullptr,                                    // const VkAttachmentReference   *pDepthStencilAttachment
-        0,                                          // uint32_t                       preserveAttachmentCount
-        nullptr                                     // const uint32_t*                pPreserveAttachments
+        0,                                              // VkSubpassDescriptionFlags      flags
+        VK_PIPELINE_BIND_POINT_GRAPHICS,                // VkPipelineBindPoint            pipelineBindPoint
+        0,                                              // uint32_t                       inputAttachmentCount
+        nullptr,                                        // const VkAttachmentReference   *pInputAttachments
+        1,                                              // uint32_t                       colorAttachmentCount
+        color_attachment_references,                    // const VkAttachmentReference   *pColorAttachments
+        nullptr,                                        // const VkAttachmentReference   *pResolveAttachments
+        nullptr,                                        // const VkAttachmentReference   *pDepthStencilAttachment
+        0,                                              // uint32_t                       preserveAttachmentCount
+        nullptr                                         // const uint32_t*                pPreserveAttachments
+      }
+    };
+
+    std::vector<VkSubpassDependency> dependencies = {
+      {
+        VK_SUBPASS_EXTERNAL,                            // uint32_t                       srcSubpass
+        0,                                              // uint32_t                       dstSubpass
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,           // VkPipelineStageFlags           srcStageMask
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // VkPipelineStageFlags           dstStageMask
+        VK_ACCESS_MEMORY_READ_BIT,                      // VkAccessFlags                  srcAccessMask
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,           // VkAccessFlags                  dstAccessMask
+        VK_DEPENDENCY_BY_REGION_BIT                     // VkDependencyFlags              dependencyFlags
+      },
+      {
+        0,                                              // uint32_t                       srcSubpass
+        VK_SUBPASS_EXTERNAL,                            // uint32_t                       dstSubpass
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // VkPipelineStageFlags           srcStageMask
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,           // VkPipelineStageFlags           dstStageMask
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,           // VkAccessFlags                  srcAccessMask
+        VK_ACCESS_MEMORY_READ_BIT,                      // VkAccessFlags                  dstAccessMask
+        VK_DEPENDENCY_BY_REGION_BIT                     // VkDependencyFlags              dependencyFlags
       }
     };
 
     VkRenderPassCreateInfo render_pass_create_info = {
-      VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,    // VkStructureType                sType
-      nullptr,                                      // const void                    *pNext
-      0,                                            // VkRenderPassCreateFlags        flags
-      1,                                            // uint32_t                       attachmentCount
-      attachment_descriptions,                      // const VkAttachmentDescription *pAttachments
-      1,                                            // uint32_t                       subpassCount
-      subpass_descriptions,                         // const VkSubpassDescription    *pSubpasses
-      0,                                            // uint32_t                       dependencyCount
-      nullptr                                       // const VkSubpassDependency     *pDependencies
+      VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,        // VkStructureType                sType
+      nullptr,                                          // const void                    *pNext
+      0,                                                // VkRenderPassCreateFlags        flags
+      1,                                                // uint32_t                       attachmentCount
+      attachment_descriptions,                          // const VkAttachmentDescription *pAttachments
+      1,                                                // uint32_t                       subpassCount
+      subpass_descriptions,                             // const VkSubpassDescription    *pSubpasses
+      static_cast<uint32_t>(dependencies.size()),       // uint32_t                       dependencyCount
+      &dependencies[0]                                  // const VkSubpassDependency     *pDependencies
     };
 
     if( vkCreateRenderPass( GetDevice(), &render_pass_create_info, nullptr, &Vulkan.RenderPass ) != VK_SUCCESS ) {
@@ -148,35 +170,37 @@ namespace ApiWithoutSecrets {
       }
     };
 
-    VkVertexInputBindingDescription vertex_binding_description = {
-      0,                                                            // uint32_t                                       binding
-      sizeof(VertexData),                                           // uint32_t                                       stride
-      VK_VERTEX_INPUT_RATE_VERTEX                                   // VkVertexInputRate                              inputRate
+    std::vector<VkVertexInputBindingDescription> vertex_binding_descriptions = {
+      {
+        0,                                                          // uint32_t                                       binding
+        sizeof(VertexData),                                         // uint32_t                                       stride
+        VK_VERTEX_INPUT_RATE_VERTEX                                 // VkVertexInputRate                              inputRate
+      }
     };
 
-    VkVertexInputAttributeDescription vertex_attribute_descriptions[] = {
+    std::vector<VkVertexInputAttributeDescription> vertex_attribute_descriptions = {
       {
         0,                                                          // uint32_t                                       location
-        vertex_binding_description.binding,                         // uint32_t                                       binding
+        vertex_binding_descriptions[0].binding,                     // uint32_t                                       binding
         VK_FORMAT_R32G32B32A32_SFLOAT,                              // VkFormat                                       format
-        0                                                           // uint32_t                                       offset
+        offsetof(struct VertexData, x)                              // uint32_t                                       offset
       },
       {
         1,                                                          // uint32_t                                       location
-        vertex_binding_description.binding,                         // uint32_t                                       binding
+        vertex_binding_descriptions[0].binding,                     // uint32_t                                       binding
         VK_FORMAT_R32G32B32A32_SFLOAT,                              // VkFormat                                       format
-        4 * sizeof(float)                                           // uint32_t                                       offset
+        offsetof(struct VertexData, r)                              // uint32_t                                       offset
       }
     };
 
     VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info = {
       VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,    // VkStructureType                                sType
       nullptr,                                                      // const void                                    *pNext
-      0,                                                            // VkPipelineVertexInputStateCreateFlags          flags;
-      1,                                                            // uint32_t                                       vertexBindingDescriptionCount
-      &vertex_binding_description,                                  // const VkVertexInputBindingDescription         *pVertexBindingDescriptions
-      2,                                                            // uint32_t                                       vertexAttributeDescriptionCount
-      vertex_attribute_descriptions                                 // const VkVertexInputAttributeDescription       *pVertexAttributeDescriptions
+      0,                                                            // VkPipelineVertexInputStateCreateFlags          flags
+      static_cast<uint32_t>(vertex_binding_descriptions.size()),    // uint32_t                                       vertexBindingDescriptionCount
+      &vertex_binding_descriptions[0],                              // const VkVertexInputBindingDescription         *pVertexBindingDescriptions
+      static_cast<uint32_t>(vertex_attribute_descriptions.size()),  // uint32_t                                       vertexAttributeDescriptionCount
+      &vertex_attribute_descriptions[0]                             // const VkVertexInputAttributeDescription       *pVertexAttributeDescriptions
     };
 
     VkPipelineInputAssemblyStateCreateInfo input_assembly_state_create_info = {
@@ -248,7 +272,7 @@ namespace ApiWithoutSecrets {
       { 0.0f, 0.0f, 0.0f, 0.0f }                                    // float                                          blendConstants[4]
     };
 
-    VkDynamicState dynamic_states[] = {
+    std::vector<VkDynamicState> dynamic_states = {
       VK_DYNAMIC_STATE_VIEWPORT,
       VK_DYNAMIC_STATE_SCISSOR,
     };
@@ -257,8 +281,8 @@ namespace ApiWithoutSecrets {
       VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,         // VkStructureType                                sType
       nullptr,                                                      // const void                                    *pNext
       0,                                                            // VkPipelineDynamicStateCreateFlags              flags
-      2,                                                            // uint32_t                                       dynamicStateCount
-      dynamic_states                                                // const VkDynamicState                          *pDynamicStates
+      static_cast<uint32_t>(dynamic_states.size()),                 // uint32_t                                       dynamicStateCount
+      &dynamic_states[0]                                            // const VkDynamicState                          *pDynamicStates
     };
 
     Tools::AutoDeleter<VkPipelineLayout, PFN_vkDestroyPipelineLayout> pipeline_layout = CreatePipelineLayout();
@@ -293,6 +317,102 @@ namespace ApiWithoutSecrets {
       return false;
     }
     return true;
+  }
+
+  bool Tutorial04::CreateVertexBuffer() {
+    VertexData vertex_data[] = {
+      {
+        -0.7f, -0.7f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f, 0.0f
+      },
+      {
+        -0.7f, 0.7f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 0.0f
+      },
+      {
+        0.7f, -0.7f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 0.0f
+      },
+      {
+        0.7f, 0.7f, 0.0f, 1.0f,
+        0.3f, 0.3f, 0.3f, 0.0f
+      }
+    };
+
+    Vulkan.VertexBuffer.Size = sizeof(vertex_data);
+
+    VkBufferCreateInfo buffer_create_info = {
+      VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,             // VkStructureType        sType
+      nullptr,                                          // const void            *pNext
+      0,                                                // VkBufferCreateFlags    flags
+      Vulkan.VertexBuffer.Size,                         // VkDeviceSize           size
+      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,                // VkBufferUsageFlags     usage
+      VK_SHARING_MODE_EXCLUSIVE,                        // VkSharingMode          sharingMode
+      0,                                                // uint32_t               queueFamilyIndexCount
+      nullptr                                           // const uint32_t        *pQueueFamilyIndices
+    };
+
+    if( vkCreateBuffer( GetDevice(), &buffer_create_info, nullptr, &Vulkan.VertexBuffer.Handle ) != VK_SUCCESS ) {
+      std::cout << "Could not create a vertex buffer!" << std::endl;
+      return false;
+    }
+
+    if( !AllocateBufferMemory( Vulkan.VertexBuffer.Handle, &Vulkan.VertexBuffer.Memory ) ) {
+      std::cout << "Could not allocate memory for a vertex buffer!" << std::endl;
+      return false;
+    }
+
+    if( vkBindBufferMemory( GetDevice(), Vulkan.VertexBuffer.Handle, Vulkan.VertexBuffer.Memory, 0 ) != VK_SUCCESS ) {
+      std::cout << "Could not bind memory for a vertex buffer!" << std::endl;
+      return false;
+    }
+
+    void *vertex_buffer_memory_pointer;
+    if( vkMapMemory( GetDevice(), Vulkan.VertexBuffer.Memory, 0, Vulkan.VertexBuffer.Size, 0, &vertex_buffer_memory_pointer ) != VK_SUCCESS ) {
+      std::cout << "Could not map memory and upload data to a vertex buffer!" << std::endl;
+      return false;
+    }
+
+    memcpy( vertex_buffer_memory_pointer, vertex_data, Vulkan.VertexBuffer.Size );
+
+    VkMappedMemoryRange flush_range = {
+      VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,            // VkStructureType        sType
+      nullptr,                                          // const void            *pNext
+      Vulkan.VertexBuffer.Memory,                       // VkDeviceMemory         memory
+      0,                                                // VkDeviceSize           offset
+      VK_WHOLE_SIZE                                     // VkDeviceSize           size
+    };
+    vkFlushMappedMemoryRanges( GetDevice(), 1, &flush_range );
+
+    vkUnmapMemory( GetDevice(), Vulkan.VertexBuffer.Memory );
+
+    return true;
+  }
+
+  bool Tutorial04::AllocateBufferMemory( VkBuffer buffer, VkDeviceMemory *memory ) {
+    VkMemoryRequirements buffer_memory_requirements;
+    vkGetBufferMemoryRequirements( GetDevice(), buffer, &buffer_memory_requirements );
+
+    VkPhysicalDeviceMemoryProperties memory_properties;
+    vkGetPhysicalDeviceMemoryProperties( GetPhysicalDevice(), &memory_properties );
+
+    for( uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i ) {
+      if( (buffer_memory_requirements.memoryTypeBits & (1 << i)) &&
+        (memory_properties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) ) {
+
+        VkMemoryAllocateInfo memory_allocate_info = {
+          VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,     // VkStructureType                        sType
+          nullptr,                                    // const void                            *pNext
+          buffer_memory_requirements.size,            // VkDeviceSize                           allocationSize
+          i                                           // uint32_t                               memoryTypeIndex
+        };
+
+        if( vkAllocateMemory( GetDevice(), &memory_allocate_info, nullptr, memory ) == VK_SUCCESS ) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   bool Tutorial04::CreateRenderingResources() {
@@ -354,9 +474,9 @@ namespace ApiWithoutSecrets {
 
   bool Tutorial04::CreateSemaphores() {
     VkSemaphoreCreateInfo semaphore_create_info = {
-      VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,      // VkStructureType          sType
-      nullptr,                                      // const void*              pNext
-      0                                             // VkSemaphoreCreateFlags   flags
+      VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,          // VkStructureType                sType
+      nullptr,                                          // const void*                    pNext
+      0                                                 // VkSemaphoreCreateFlags         flags
     };
 
     for( size_t i = 0; i < Vulkan.RenderingResources.size(); ++i ) {
@@ -385,151 +505,10 @@ namespace ApiWithoutSecrets {
     return true;
   }
 
-  bool Tutorial04::CreateVertexBuffer() {
-    VertexData vertex_data[] = {
-      {
-        -0.7f, -0.7f, 0.0f, 1.0f,
-        1.0f, 0.0f, 0.0f, 0.0f
-      },
-      {
-        -0.7f, 0.7f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 0.0f
-      },
-      {
-        0.7f, -0.7f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 0.0f
-      },
-      {
-        0.7f, 0.7f, 0.0f, 1.0f,
-        0.3f, 0.3f, 0.3f, 0.0f
-      }
-    };
-
-    Vulkan.VertexBuffer.Size = sizeof(vertex_data);
-
-    VkBufferCreateInfo buffer_create_info = {
-      VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,             // VkStructureType                    sType
-      nullptr,                                          // const void                        *pNext
-      0,                                                // VkBufferCreateFlags                flags
-      Vulkan.VertexBuffer.Size,                         // VkDeviceSize                       size
-      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,                // VkBufferUsageFlags                 usage
-      VK_SHARING_MODE_EXCLUSIVE,                        // VkSharingMode                      sharingMode
-      0,                                                // uint32_t                           queueFamilyIndexCount
-      nullptr                                           // const uint32_t                    *pQueueFamilyIndices
-    };
-
-    if( vkCreateBuffer( GetDevice(), &buffer_create_info, nullptr, &Vulkan.VertexBuffer.Handle ) != VK_SUCCESS ) {
-      std::cout << "Could not create a vertex buffer!" << std::endl;
+  bool Tutorial04::PrepareFrame( VkCommandBuffer command_buffer, const ImageParameters &image_parameters, VkFramebuffer &framebuffer ) {
+    if( !CreateFramebuffer( framebuffer, image_parameters.View ) ) {
       return false;
     }
-
-    if( !AllocateBufferMemory( Vulkan.VertexBuffer.Handle, &Vulkan.VertexBuffer.Memory ) ) {
-      std::cout << "Could not allocate memory for a vertex buffer!" << std::endl;
-      return false;
-    }
-
-    if( vkBindBufferMemory( GetDevice(), Vulkan.VertexBuffer.Handle, Vulkan.VertexBuffer.Memory, 0 ) != VK_SUCCESS ) {
-      std::cout << "Could not bind memory for a vertex buffer!" << std::endl;
-      return false;
-    }
-
-    void *vertex_buffer_memory_pointer;
-    if( vkMapMemory( GetDevice(), Vulkan.VertexBuffer.Memory, 0, Vulkan.VertexBuffer.Size, 0, &vertex_buffer_memory_pointer ) != VK_SUCCESS ) {
-      std::cout << "Could not map memory and upload data to a vertex buffer!" << std::endl;
-      return false;
-    }
-
-    memcpy( vertex_buffer_memory_pointer, vertex_data, Vulkan.VertexBuffer.Size );
-
-    vkUnmapMemory( GetDevice(), Vulkan.VertexBuffer.Memory );
-
-    if( !CommitMemoryChanges( Vulkan.VertexBuffer.Handle, Vulkan.VertexBuffer.Size ) ) {
-      std::cout << "Could not setup a barrier for a vertex buffer!" << std::endl;
-      return false;
-    }
-
-    return true;
-  }
-
-  bool Tutorial04::AllocateBufferMemory( VkBuffer buffer, VkDeviceMemory *memory ) {
-    VkMemoryRequirements buffer_memory_requirements;
-    vkGetBufferMemoryRequirements( GetDevice(), Vulkan.VertexBuffer.Handle, &buffer_memory_requirements );
-
-    VkPhysicalDeviceMemoryProperties memory_properties;
-    vkGetPhysicalDeviceMemoryProperties( GetPhysicalDevice(), &memory_properties );
-
-    for( uint32_t i = 0; i < memory_properties.memoryTypeCount; ++i ) {
-      if( (buffer_memory_requirements.memoryTypeBits & (1 << i)) &&
-        (memory_properties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) ) {
-
-        VkMemoryAllocateInfo memory_allocate_info = {
-          VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,     // VkStructureType                        sType
-          nullptr,                                    // const void                            *pNext
-          buffer_memory_requirements.size,            // VkDeviceSize                           allocationSize
-          i                                           // uint32_t                               memoryTypeIndex
-        };
-
-        if( vkAllocateMemory( GetDevice(), &memory_allocate_info, nullptr, memory ) == VK_SUCCESS ) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  bool Tutorial04::CommitMemoryChanges( VkBuffer buffer, VkDeviceSize size ) {
-    VkCommandBufferBeginInfo command_buffer_begin_info = {
-      VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,    // VkStructureType                        sType
-      nullptr,                                        // const void                            *pNext
-      VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,    // VkCommandBufferUsageFlags              flags
-      nullptr                                         // const VkCommandBufferInheritanceInfo  *pInheritanceInfo
-    };
-
-    VkBufferMemoryBarrier barrier_from_host_write_to_attribute_read = {
-      VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,        // VkStructureType                        sType
-      nullptr,                                        // const void                            *pNext
-      VK_ACCESS_HOST_WRITE_BIT,                       // VkAccessFlags                          srcAccessMask
-      VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,            // VkAccessFlags                          dstAccessMask
-      GetGraphicsQueue().FamilyIndex,                 // uint32_t                               srcQueueFamilyIndex
-      GetGraphicsQueue().FamilyIndex,                 // uint32_t                               dstQueueFamilyIndex
-      buffer,                                         // VkBuffer                               buffer
-      0,                                              // VkDeviceSize                           offset
-      size                                            // VkDeviceSize                           size
-    };
-
-    vkBeginCommandBuffer( Vulkan.RenderingResources[0].CommandBuffer, &command_buffer_begin_info );
-
-    vkCmdPipelineBarrier( Vulkan.RenderingResources[0].CommandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &barrier_from_host_write_to_attribute_read, 0, nullptr );
-
-    if( vkEndCommandBuffer( Vulkan.RenderingResources[0].CommandBuffer ) != VK_SUCCESS ) {
-      std::cout << "Could not record command with buffer barrier!" << std::endl;
-      return false;
-    }
-
-    VkSubmitInfo submit_rendering_info = {
-      VK_STRUCTURE_TYPE_SUBMIT_INFO,                  // VkStructureType                        sType
-      nullptr,                                        // const void                            *pNext
-      0,                                              // uint32_t                               waitSemaphoreCount
-      nullptr,                                        // const VkSemaphore                     *pWaitSemaphores
-      nullptr,                                        // const VkPipelineStageFlags            *pWaitDstStageMask;
-      1,                                              // uint32_t                               commandBufferCount
-      &Vulkan.RenderingResources[0].CommandBuffer,    // const VkCommandBuffer                 *pCommandBuffers
-      0,                                              // uint32_t                               signalSemaphoreCount
-      nullptr                                         // const VkSemaphore                     *pSignalSemaphores
-    };
-
-    if( vkQueueSubmit( GetGraphicsQueue().Handle, 1, &submit_rendering_info, VK_NULL_HANDLE ) != VK_SUCCESS ) {
-      std::cout << "Error occurred during submission of command buffer with vertex buffer barrier!!" << std::endl;
-      return false;
-    }
-
-    vkDeviceWaitIdle( GetDevice() );
-
-    return true;
-  }
-
-  bool Tutorial04::RecordCommandBuffer( VkCommandBuffer command_buffer, VkImage image, VkImageView image_view ) {
-    Tools::AutoDeleter<VkFramebuffer, PFN_vkDestroyFramebuffer> framebuffer = CreateFramebuffer( image_view );
 
     VkCommandBufferBeginInfo command_buffer_begin_info = {
       VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,        // VkStructureType                        sType
@@ -548,21 +527,21 @@ namespace ApiWithoutSecrets {
       1                                                   // uint32_t                               layerCount
     };
 
-    uint32_t present_queue_family_index = (GetPresentQueue().Handle != GetGraphicsQueue().Handle) ? GetPresentQueue().FamilyIndex : VK_QUEUE_FAMILY_IGNORED;
-    uint32_t graphics_queue_family_index = (GetPresentQueue().Handle != GetGraphicsQueue().Handle) ? GetGraphicsQueue().FamilyIndex : VK_QUEUE_FAMILY_IGNORED;
-    VkImageMemoryBarrier barrier_from_present_to_draw = {
-      VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,             // VkStructureType                        sType
-      nullptr,                                            // const void                            *pNext
-      VK_ACCESS_MEMORY_READ_BIT,                          // VkAccessFlags                          srcAccessMask
-      VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,               // VkAccessFlags                          dstAccessMask
-      VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                    // VkImageLayout                          oldLayout
-      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,           // VkImageLayout                          newLayout
-      present_queue_family_index,                         // uint32_t                               srcQueueFamilyIndex
-      graphics_queue_family_index,                        // uint32_t                               dstQueueFamilyIndex
-      image,                                              // VkImage                                image
-      image_subresource_range                             // VkImageSubresourceRange                subresourceRange
-    };
-    vkCmdPipelineBarrier( command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_from_present_to_draw );
+    if( GetPresentQueue().Handle != GetGraphicsQueue().Handle ) {
+      VkImageMemoryBarrier barrier_from_present_to_draw = {
+        VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,           // VkStructureType                        sType
+        nullptr,                                          // const void                            *pNext
+        VK_ACCESS_MEMORY_READ_BIT,                        // VkAccessFlags                          srcAccessMask
+        VK_ACCESS_MEMORY_READ_BIT,                        // VkAccessFlags                          dstAccessMask
+        VK_IMAGE_LAYOUT_UNDEFINED,                        // VkImageLayout                          oldLayout
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  // VkImageLayout                          newLayout
+        GetPresentQueue().FamilyIndex,                    // uint32_t                               srcQueueFamilyIndex
+        GetGraphicsQueue().FamilyIndex,                   // uint32_t                               dstQueueFamilyIndex
+        image_parameters.Handle,                          // VkImage                                image
+        image_subresource_range                           // VkImageSubresourceRange                subresourceRange
+      };
+      vkCmdPipelineBarrier( command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_from_present_to_draw );
+    }
 
     VkClearValue clear_value = {
       { 1.0f, 0.8f, 0.4f, 0.0f },                         // VkClearColorValue                      color
@@ -572,7 +551,7 @@ namespace ApiWithoutSecrets {
       VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,           // VkStructureType                        sType
       nullptr,                                            // const void                            *pNext
       Vulkan.RenderPass,                                  // VkRenderPass                           renderPass
-      framebuffer.Get(),                                  // VkFramebuffer                          framebuffer
+      framebuffer,                                        // VkFramebuffer                          framebuffer
       {                                                   // VkRect2D                               renderArea
         {                                                 // VkOffset2D                             offset
           0,                                                // int32_t                                x
@@ -618,19 +597,21 @@ namespace ApiWithoutSecrets {
 
     vkCmdEndRenderPass( command_buffer );
 
-    VkImageMemoryBarrier barrier_from_draw_to_present = {
-      VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,             // VkStructureType                        sType
-      nullptr,                                            // const void                            *pNext
-      VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,               // VkAccessFlags                          srcAccessMask
-      VK_ACCESS_MEMORY_READ_BIT,                          // VkAccessFlags                          dstAccessMask
-      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,           // VkImageLayout                          oldLayout
-      VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                    // VkImageLayout                          newLayout
-      graphics_queue_family_index,                        // uint32_t                               srcQueueFamilyIndex
-      present_queue_family_index,                         // uint32_t                               dstQueueFamilyIndex
-      image,                                              // VkImage                                image
-      image_subresource_range                             // VkImageSubresourceRange                subresourceRange
-    };
-    vkCmdPipelineBarrier( command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_from_draw_to_present );
+    if( GetGraphicsQueue().Handle != GetPresentQueue().Handle ) {
+      VkImageMemoryBarrier barrier_from_draw_to_present = {
+        VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,           // VkStructureType                        sType
+        nullptr,                                          // const void                            *pNext
+        VK_ACCESS_MEMORY_READ_BIT,                        // VkAccessFlags                          srcAccessMask
+        VK_ACCESS_MEMORY_READ_BIT,                        // VkAccessFlags                          dstAccessMask
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  // VkImageLayout                          oldLayout
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,                  // VkImageLayout                          newLayout
+        GetGraphicsQueue().FamilyIndex,                   // uint32_t                               srcQueueFamilyIndex
+        GetPresentQueue().FamilyIndex,                    // uint32_t                               dstQueueFamilyIndex
+        image_parameters.Handle,                          // VkImage                                image
+        image_subresource_range                           // VkImageSubresourceRange                subresourceRange
+      };
+      vkCmdPipelineBarrier( command_buffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier_from_draw_to_present );
+    }
 
     if( vkEndCommandBuffer( command_buffer ) != VK_SUCCESS ) {
       std::cout << "Could not record command buffer!" << std::endl;
@@ -639,7 +620,12 @@ namespace ApiWithoutSecrets {
     return true;
   }
 
-  Tools::AutoDeleter<VkFramebuffer, PFN_vkDestroyFramebuffer> Tutorial04::CreateFramebuffer( VkImageView image_view ) {
+  bool Tutorial04::CreateFramebuffer( VkFramebuffer &framebuffer, VkImageView image_view ) {
+    if( framebuffer != VK_NULL_HANDLE ) {
+      vkDestroyFramebuffer( GetDevice(), framebuffer, nullptr );
+      framebuffer = VK_NULL_HANDLE;
+    }
+
     VkFramebufferCreateInfo framebuffer_create_info = {
       VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,      // VkStructureType                sType
       nullptr,                                        // const void                    *pNext
@@ -652,13 +638,12 @@ namespace ApiWithoutSecrets {
       1                                               // uint32_t                       layers
     };
 
-    VkFramebuffer framebuffer;
     if( vkCreateFramebuffer( GetDevice(), &framebuffer_create_info, nullptr, &framebuffer ) != VK_SUCCESS ) {
       std::cout << "Could not create a framebuffer!" << std::endl;
-      return Tools::AutoDeleter<VkFramebuffer, PFN_vkDestroyFramebuffer>();
+      return false;
     }
 
-    return Tools::AutoDeleter<VkFramebuffer, PFN_vkDestroyFramebuffer>( framebuffer, vkDestroyFramebuffer, GetDevice() );
+    return true;
   }
 
   bool Tutorial04::ChildOnWindowSizeChanged() {
@@ -667,7 +652,7 @@ namespace ApiWithoutSecrets {
 
   bool Tutorial04::Draw() {
     static size_t           resource_index = 0;
-    RenderingResourcesData  current_rendering_resource = Vulkan.RenderingResources[resource_index];
+    RenderingResourcesData &current_rendering_resource = Vulkan.RenderingResources[resource_index];
     VkSwapchainKHR          swap_chain = GetSwapChain().Handle;
     uint32_t                image_index;
 
@@ -691,11 +676,11 @@ namespace ApiWithoutSecrets {
         return false;
     }
 
-    if( !RecordCommandBuffer( current_rendering_resource.CommandBuffer, GetSwapChain().Images[image_index].Handle, GetSwapChain().Images[image_index].ImageView ) ) {
+    if( !PrepareFrame( current_rendering_resource.CommandBuffer, GetSwapChain().Images[image_index], current_rendering_resource.Framebuffer ) ) {
       return false;
     }
 
-    VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     VkSubmitInfo submit_info = {
       VK_STRUCTURE_TYPE_SUBMIT_INFO,                          // VkStructureType              sType
       nullptr,                                                // const void                  *pNext
@@ -746,6 +731,9 @@ namespace ApiWithoutSecrets {
       vkDeviceWaitIdle( GetDevice() );
 
       for( size_t i = 0; i < Vulkan.RenderingResources.size(); ++i ) {
+        if( Vulkan.RenderingResources[i].Framebuffer != VK_NULL_HANDLE ) {
+          vkDestroyFramebuffer( GetDevice(), Vulkan.RenderingResources[i].Framebuffer, nullptr );
+        }
         if( Vulkan.RenderingResources[i].CommandBuffer != VK_NULL_HANDLE ) {
           vkFreeCommandBuffers( GetDevice(), Vulkan.CommandPool, 1, &Vulkan.RenderingResources[i].CommandBuffer );
         }

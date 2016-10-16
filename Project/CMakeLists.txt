@@ -68,14 +68,15 @@ set( BASIC_SHARED_SOURCE_FILES
 		"Common/OperatingSystem.cpp"
 		"Common/VulkanFunctions.cpp" )
 
-set( VULKAN_HEADER_FILES
+set( EXTERNAL_HEADER_FILES
 		"Include/vk_platform.h"
-		"Include/vulkan.h" )
+		"Include/vulkan.h"
+		"Include/stb_image.h" )
 
 set( ALL_BASIC_SHARED_FILES
 		${BASIC_SHARED_HEADER_FILES}
 		${BASIC_SHARED_SOURCE_FILES}
-		${VULKAN_HEADER_FILES} )
+		${EXTERNAL_HEADER_FILES} )
 
 set( ADVANCED_SHARED_HEADER_FILES
 		"Common/Tools.h"
@@ -98,7 +99,7 @@ set( TUTORIAL_SOURCE_FILES REGULAR_EXPRESSION
 
 source_group( "Header Files\\Common" FILES ${BASIC_SHARED_HEADER_FILES} )
 source_group( "Source Files\\Common" FILES ${BASIC_SHARED_SOURCE_FILES} )
-source_group( "Header Files\\Include" FILES ${VULKAN_HEADER_FILES} )
+source_group( "Header Files\\Include" FILES ${EXTERNAL_HEADER_FILES} )
 source_group( "Header Files\\Common" FILES ${ADVANCED_SHARED_HEADER_FILES} )
 source_group( "Source Files\\Common" FILES ${ADVANCED_SHARED_SOURCE_FILES} )
 source_group( "Header Files" FILES ${TUTORIAL_HEADER_FILES} )
@@ -128,3 +129,21 @@ add_executable( "04" "Vertex_Attributes"
 	Tutorial04/Tutorial04.h
 	Tutorial04/main.cpp
 	Tutorial04/Tutorial04.cpp )
+	
+add_executable( "05" "Staging_Resources"
+	${ALL_BASIC_AND_ADVANCED_SHARED_FILES}
+	Tutorial05/Tutorial05.h
+	Tutorial05/main.cpp
+	Tutorial05/Tutorial05.cpp )
+
+add_executable( "06" "Descriptor_Sets"
+	${ALL_BASIC_AND_ADVANCED_SHARED_FILES}
+	Tutorial06/Tutorial06.h
+	Tutorial06/main.cpp
+	Tutorial06/Tutorial06.cpp )
+
+add_executable( "07" "Uniform_Buffers"
+	${ALL_BASIC_AND_ADVANCED_SHARED_FILES}
+	Tutorial07/Tutorial07.h
+	Tutorial07/main.cpp
+	Tutorial07/Tutorial07.cpp )

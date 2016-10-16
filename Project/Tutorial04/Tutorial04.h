@@ -8,8 +8,8 @@
 // Intel does not assume any responsibility for any errors which may appear in this software
 // nor any responsibility to update it.
 
-#if !defined(TUTORIAL_03_HEADER)
-#define TUTORIAL_03_HEADER
+#if !defined(TUTORIAL_04_HEADER)
+#define TUTORIAL_04_HEADER
 
 #include "VulkanCommon.h"
 #include "Tools.h"
@@ -49,12 +49,14 @@ namespace ApiWithoutSecrets {
   // Struct containing data used during rendering process         //
   // ************************************************************ //
   struct RenderingResourcesData {
-    VkCommandBuffer                 CommandBuffer;
-    VkSemaphore                     ImageAvailableSemaphore;
-    VkSemaphore                     FinishedRenderingSemaphore;
-    VkFence                         Fence;
+    VkFramebuffer                         Framebuffer;
+    VkCommandBuffer                       CommandBuffer;
+    VkSemaphore                           ImageAvailableSemaphore;
+    VkSemaphore                           FinishedRenderingSemaphore;
+    VkFence                               Fence;
 
     RenderingResourcesData() :
+      Framebuffer( VK_NULL_HANDLE ),
       CommandBuffer( VK_NULL_HANDLE ),
       ImageAvailableSemaphore( VK_NULL_HANDLE ),
       FinishedRenderingSemaphore( VK_NULL_HANDLE ),
@@ -97,8 +99,8 @@ namespace ApiWithoutSecrets {
 
     bool    CreateRenderPass();
     bool    CreatePipeline();
-    bool    CreateRenderingResources();
     bool    CreateVertexBuffer();
+    bool    CreateRenderingResources();
 
     bool    Draw() override;
 
@@ -107,15 +109,14 @@ namespace ApiWithoutSecrets {
 
     Tools::AutoDeleter<VkShaderModule, PFN_vkDestroyShaderModule>     CreateShaderModule( const char* filename );
     Tools::AutoDeleter<VkPipelineLayout, PFN_vkDestroyPipelineLayout> CreatePipelineLayout();
+    bool                                                              AllocateBufferMemory( VkBuffer buffer, VkDeviceMemory *memory );
     bool                                                              CreateCommandPool( uint32_t queue_family_index, VkCommandPool *pool );
     bool                                                              AllocateCommandBuffers( VkCommandPool pool, uint32_t count, VkCommandBuffer *command_buffers );
     bool                                                              CreateCommandBuffers();
     bool                                                              CreateSemaphores();
     bool                                                              CreateFences();
-    bool                                                              AllocateBufferMemory( VkBuffer buffer, VkDeviceMemory *memory );
-    bool                                                              CommitMemoryChanges( VkBuffer buffer, VkDeviceSize size );
-    bool                                                              RecordCommandBuffer( VkCommandBuffer command_buffer, VkImage image, VkImageView image_view );
-    Tools::AutoDeleter<VkFramebuffer, PFN_vkDestroyFramebuffer>       CreateFramebuffer( VkImageView image_view );
+    bool                                                              PrepareFrame( VkCommandBuffer command_buffer, const ImageParameters &image_parameters, VkFramebuffer &framebuffer );
+    bool                                                              CreateFramebuffer( VkFramebuffer &framebuffer, VkImageView image_view );
 
     void                                                              ChildClear() override;
     bool                                                              ChildOnWindowSizeChanged() override;
@@ -123,4 +124,4 @@ namespace ApiWithoutSecrets {
 
 } // namespace ApiWithoutSecrets
 
-#endif // TUTORIAL_03_HEADER
+#endif // TUTORIAL_04_HEADER

@@ -1,5 +1,5 @@
-shader.frag
-Warning, version 430 is not yet complete; most version-specific features are present, but some are missing.
+Tutorial04/Data04/shader.frag
+Warning, version 450 is not yet complete; most version-specific features are present, but some are missing.
 
 
 Linked fragment stage:
@@ -14,7 +14,7 @@ Linked fragment stage:
                               MemoryModel Logical GLSL450
                               EntryPoint Fragment 4  "main" 9 11
                               ExecutionMode 4 OriginLowerLeft
-                              Source GLSL 430
+                              Source GLSL 450
                               Name 4  "main"
                               Name 9  "o_Color"
                               Name 11  "v_Color"

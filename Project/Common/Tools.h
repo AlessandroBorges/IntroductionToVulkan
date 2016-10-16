@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include "vulkan.h"
 
 namespace ApiWithoutSecrets {
@@ -70,7 +71,7 @@ namespace ApiWithoutSecrets {
 
     private:
       AutoDeleter( const AutoDeleter& );
-      AutoDeleter& operator=(const AutoDeleter&);
+      AutoDeleter& operator=( const AutoDeleter& );
       T         Object;
       F         Deleter;
       VkDevice  Device;
@@ -82,6 +83,27 @@ namespace ApiWithoutSecrets {
     // Function reading binary contents of a file                   //
     // ************************************************************ //
     std::vector<char> GetBinaryFileContents( std::string const &filename );
+
+    // ************************************************************ //
+    // GetImageData                                                 //
+    //                                                              //
+    // Function loading image (texture) data from a specified file  //
+    // ************************************************************ //
+    std::vector<char> GetImageData( std::string const &filename, int requested_components, int *width, int *height, int *components, int *data_size );
+
+    // ************************************************************ //
+    // GetPerspectiveProjectionMatrix                               //
+    //                                                              //
+    // Function calculating perspective projection matrix           //
+    // ************************************************************ //
+    std::array<float, 16> GetPerspectiveProjectionMatrix( float const aspect_ratio, float const field_of_view, float const near_clip, float const far_clip );
+
+    // ************************************************************ //
+    // GetOrthographicsProjectionMatrix                             //
+    //                                                              //
+    // Function calculating orthographic projection matrix          //
+    // ************************************************************ //
+	std::array<float, 16> GetOrthographicProjectionMatrix( float const left_plane, float const right_plane, float const top_plane, float const bottom_plane, float const near_plane, float const far_plane );
 
   } // namespace Tools
 

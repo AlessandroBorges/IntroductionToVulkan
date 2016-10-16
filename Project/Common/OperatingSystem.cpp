@@ -8,6 +8,8 @@
 // Intel does not assume any responsibility for any errors which may appear in this software
 // nor any responsibility to update it.
 
+#include <thread>
+#include <chrono>
 #include "OperatingSystem.h"
 
 namespace ApiWithoutSecrets {
@@ -94,6 +96,7 @@ namespace ApiWithoutSecrets {
       MSG message;
       bool loop = true;
       bool resize = false;
+      bool result = true;
 
       while( loop ) {
         if( PeekMessage( &message, NULL, 0, 0, PM_REMOVE ) ) {
@@ -115,16 +118,22 @@ namespace ApiWithoutSecrets {
           if( resize ) {
             resize = false;
             if( !tutorial.OnWindowSizeChanged() ) {
-              loop = false;
+              result = false;
+              break;
             }
           }
-          if( !tutorial.Draw() ) {
-            loop = false;
+          if( tutorial.ReadyToDraw() ) {
+            if( !tutorial.Draw() ) {
+              result = false;
+              break;
+            }
+          } else {
+            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
           }
         }
       }
 
-      return true;
+      return result;
     }
 
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
@@ -203,6 +212,7 @@ namespace ApiWithoutSecrets {
       xcb_generic_event_t *event;
       bool loop = true;
       bool resize = false;
+      bool result = true;
 
       while( loop ) {
         event = xcb_poll_for_event( Parameters.Connection );
@@ -241,16 +251,22 @@ namespace ApiWithoutSecrets {
           if( resize ) {
             resize = false;
             if( !tutorial.OnWindowSizeChanged() ) {
-              loop = false;
+              result = false;
+              break;
             }
           }
-          if( !tutorial.Draw() ) {
-            loop = false;
+          if( tutorial.ReadyToDraw() ) {
+            if( !tutorial.Draw() ) {
+              result = false;
+              break;
+            }
+          } else {
+            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
           }
         }
       }
 
-      return true;
+      return result;
     }
 
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
@@ -299,6 +315,7 @@ namespace ApiWithoutSecrets {
       XEvent event;
       bool loop = true;
       bool resize = false;
+      bool result = true;
 
       while( loop ) {
         if( XPending( Parameters.DisplayPtr ) ) {
@@ -334,16 +351,22 @@ namespace ApiWithoutSecrets {
           if( resize ) {
             resize = false;
             if( !tutorial.OnWindowSizeChanged() ) {
-              loop = false;
+              result = false;
+              break;
             }
           }
-          if( !tutorial.Draw() ) {
-            loop = false;
+          if( tutorial.ReadyToDraw() ) {
+            if( !tutorial.Draw() ) {
+              result = false;
+              break;
+            }
+          } else {
+            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
           }
         }
       }
 
-      return true;
+      return result;
     }
 
 #endif

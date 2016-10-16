@@ -58,8 +58,19 @@ namespace ApiWithoutSecrets {
       virtual bool OnWindowSizeChanged() = 0;
       virtual bool Draw() = 0;
 
+      virtual bool ReadyToDraw() const final {
+        return CanRender;
+      }
+
+      TutorialBase() :
+        CanRender( false ) {
+      }
+
       virtual ~TutorialBase() {
       }
+
+    protected:
+      bool CanRender;
     };
 
     // ************************************************************ //

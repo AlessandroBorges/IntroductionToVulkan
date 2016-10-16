@@ -39,11 +39,15 @@ namespace ApiWithoutSecrets {
   // ************************************************************ //
   struct ImageParameters {
     VkImage                       Handle;
-    VkImageView                   ImageView;
+    VkImageView                   View;
+    VkSampler                     Sampler;
+    VkDeviceMemory                Memory;
 
     ImageParameters() :
       Handle( VK_NULL_HANDLE ),
-      ImageView( VK_NULL_HANDLE ) {
+      View( VK_NULL_HANDLE ),
+      Sampler( VK_NULL_HANDLE ),
+      Memory( VK_NULL_HANDLE ) {
     }
   };
 

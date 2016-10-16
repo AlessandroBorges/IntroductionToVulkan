@@ -8,7 +8,12 @@
 // Intel does not assume any responsibility for any errors which may appear in this software
 // nor any responsibility to update it.
 
-#version 400
+#version 450
+
+out gl_PerVertex
+{
+  vec4 gl_Position;
+};
 
 void main() {
     vec2 pos[3] = vec2[3]( vec2(-0.7, 0.7), vec2(0.7, 0.7), vec2(0.0, -0.7) );

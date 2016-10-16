@@ -31,10 +31,10 @@ int main( int argc, char **argv ) {
   if( !tutorial04.CreatePipeline() ) {
     return -1;
   }
-  if( !tutorial04.CreateRenderingResources() ) {
+  if( !tutorial04.CreateVertexBuffer() ) {
     return -1;
   }
-  if( !tutorial04.CreateVertexBuffer() ) {
+  if( !tutorial04.CreateRenderingResources() ) {
     return -1;
   }
 
